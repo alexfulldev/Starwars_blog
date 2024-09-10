@@ -1,45 +1,91 @@
 const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
+    return {
+        store: {
+			people: [],
+			vehicles: [],
+			planets: [],
+			peopleDetails: null,
+			vehicleDetails: null,
+			planetDetails: null,
+			favorites: []
 		},
-		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+        actions: {
+            getPeople: async () => {
+                try {
+                    const resp = await fetch('https://www.swapi.tech/api/people');
+                    if (!resp.ok) throw new Error('Error fetching people');
+                    const data = await resp.json();
+                    setStore({ people: data.results });
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            getVehicles: async () => {
+                try {
+                    const resp = await fetch('https://www.swapi.tech/api/vehicles');
+                    if (!resp.ok) throw new Error('Error fetching vehicles');
+                    const data = await resp.json();
+                    setStore({ vehicles: data.results });
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            getPlanets: async () => {
+                try {
+                    const resp = await fetch('https://www.swapi.tech/api/planets');
+                    if (!resp.ok) throw new Error('Error fetching planets');
+                    const data = await resp.json();
+                    setStore({ planets: data.results });
+                } catch (error) {
+                    console.log(error);
+                }
+            },
+            getPeopleDetails: async (uid) => {
+				try {
+					const resp = await fetch('https://www.swapi.tech/api/people/'+uid);
+					console.log(resp)
+					if (!resp.ok) throw new Error('Error fetching people')
+					const data = await resp.json();
+					console.log(data)
+					setStore({peopleDetails: data.result})
+				} catch (error) {
+					console.log(error);
+				}
 			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
+            getVehiclesDetails: async (uid) => {
+				try {
+					const resp = await fetch('https://www.swapi.tech/api/vehicles/'+uid);
+                    console.log(resp)
+					if (!resp.ok) throw new Error('Error fetching vehicle');
+					const data = await resp.json();
+                    console.log(data)
+					setStore({vehiclesDetails: data.result});
+				} catch (error) {
+					console.log(error);
+				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
-			}
-		}
-	};
+			getPlanetsDetails: async (uid) => {
+				try {
+					const resp = await fetch('https://www.swapi.tech/api/planets/'+uid);
+                    console.log(resp)
+					if (!resp.ok) throw new Error('Error fetching planet');
+					const data = await resp.json();
+                    console.log(data)
+					setStore({planetsDetails: data.result});
+				} catch (error) {
+					console.log(error);
+				}
+			},
+            addFavorite: (item) => {
+                const store = getStore();
+                setStore({ favorites: [...store.favorites, item] });
+            },
+            removeFavorite: (uid) => {
+                const store = getStore();
+                setStore({ favorites: store.favorites.filter(fav => fav.uid !== uid) });
+            }
+        }
+    };
 };
 
 export default getState;
